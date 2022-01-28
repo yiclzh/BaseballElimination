@@ -1,6 +1,5 @@
 import edu.princeton.cs.algs4.In;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class BaseballElimination {
 
@@ -29,11 +28,6 @@ public class BaseballElimination {
                 g[i][j] = in.readInt();
             }
         }
-        System.out.println(teams);
-        System.out.println(Arrays.toString(w));
-        System.out.println(Arrays.toString(l));
-        System.out.println(Arrays.toString(r));
-        System.out.println(Arrays.deepToString(g));
 
     }
 

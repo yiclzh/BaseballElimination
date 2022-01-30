@@ -17,6 +17,7 @@ public class BaseballElimination {
 
 
     public BaseballElimination(String filename) {
+        if (filename == null) { throw new IllegalArgumentException("File cannot be null."); }
         In in = new In(filename);
         nTeams = in.readInt();
         teams = new ArrayList<>();
@@ -49,24 +50,29 @@ public class BaseballElimination {
 
     // number of wins for the given team
     public int wins(String teams) {
+        if (!this.teams.contains(teams) || teams == null) { throw new IllegalArgumentException("Illegal Argument"); }
         int i = this.teams.indexOf(teams);
         return w[i];
     }
 
     // number of losses for the given team
     public int losses(String teams) {
+        if (!this.teams.contains(teams) || teams == null) { throw new IllegalArgumentException("Illegal Argument"); }
         int i = this.teams.indexOf(teams);
         return  l[i];
     }
 
     // number of remaining games for the given team
     public int remaining(String teams) {
+        if (!this.teams.contains(teams) || teams == null) { throw new IllegalArgumentException("Illegal Argument"); }
         int i = this.teams.indexOf(teams);
         return r[i];
     }
 
     // number of remaining games between team1 and team2
     public int against(String team1, String team2) {
+        if (!teams.contains(team1) || team1 == null) { throw new IllegalArgumentException("Illegal Argument"); }
+        if (!teams.contains(team2) || team2 == null) { throw new IllegalArgumentException("Illegal Argument"); }
         int i1 = this.teams.indexOf(team1);
         int i2 = this.teams.indexOf(team2);
         return g[i1][i2];
@@ -74,6 +80,7 @@ public class BaseballElimination {
 
     // is the given team eliminated?
     public boolean isEliminated(String team) {
+        if (!teams.contains(team) || team == null) { throw new IllegalArgumentException("Illegal Argument"); }
         if (certificateOfElimination(team) == null) {
             return false;
         } else {
@@ -120,6 +127,7 @@ public class BaseballElimination {
 
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
+        if (!teams.contains(team) || team == null) { throw new IllegalArgumentException("Illegal Argument"); }
         ArrayList<String> subsetR = new ArrayList<>();
         int x = this.teams.indexOf(team);
         if (isTriviallyElimination(x)) {
@@ -146,17 +154,17 @@ public class BaseballElimination {
         return subsetR;
     }
 
-    public static void main(String[] args) {
-        BaseballElimination baseballElimination = new BaseballElimination("//home/yiclzh/Downloads/baseball/teams5.txt");
-        System.out.println(baseballElimination.numberOfTeams());
-        System.out.println(baseballElimination.teams());
-        System.out.println(baseballElimination.against("Boston", "New_York"));
-        System.out.println(baseballElimination.losses("Toronto"));
-        System.out.println(baseballElimination.wins("Baltimore"));
-        System.out.println(baseballElimination.remaining("Detroit"));
-        System.out.println(baseballElimination.isEliminated("Toronto"));
-        System.out.println(baseballElimination.isEliminated("Detroit"));
-        System.out.println(baseballElimination.isEliminated("New_York"));
-        System.out.println(baseballElimination.isEliminated("Boston"));
-    }
+//    public static void main(String[] args) {
+//        BaseballElimination baseballElimination = new BaseballElimination("//home/yiclzh/Downloads/baseball/teams5.txt");
+//        System.out.println(baseballElimination.numberOfTeams());
+//        System.out.println(baseballElimination.teams());
+//        System.out.println(baseballElimination.against("Boston", "New_York"));
+//        System.out.println(baseballElimination.losses("Toronto"));
+//        System.out.println(baseballElimination.wins("Baltimore"));
+//        System.out.println(baseballElimination.remaining("Detroit"));
+//        System.out.println(baseballElimination.isEliminated("Toronto"));
+//        System.out.println(baseballElimination.isEliminated("Detroit"));
+//        System.out.println(baseballElimination.isEliminated("New_York"));
+//        System.out.println(baseballElimination.isEliminated("Boston"));
+//    }
 }

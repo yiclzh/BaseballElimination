@@ -2,16 +2,13 @@ import edu.princeton.cs.algs4.FlowEdge;
 import edu.princeton.cs.algs4.FlowNetwork;
 import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
-import edu.princeton.cs.algs4.SET;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.Flow;
 
 public class BaseballElimination {
 
-    private final int nTeams; // number of teams
+    private final int nTeams;
     private ArrayList<String> teams;
     private int[] w;
     private int[] l;
@@ -84,7 +81,7 @@ public class BaseballElimination {
         }
     }
 
-    public FlowNetwork constructFlowNetwork(int x) {
+    private FlowNetwork constructFlowNetwork(int x) {
         int s = nTeams;
         int t = s + 1;
         int gameNode = nTeams + 2;
@@ -111,17 +108,28 @@ public class BaseballElimination {
         return flowNetwork;
     }
 
+    private boolean isTriviallyElimination(int x) {
+        for (String s : teams) {
+            int i = teams.indexOf(s);
+            if (w[x] + r[x] < w[i]) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
         ArrayList<String> subsetR = new ArrayList<>();
         int x = this.teams.indexOf(team);
-        for (String s : teams) {
-            int i = teams.indexOf(s);
-            if (w[x] + r[x] < w[i]) {
-                subsetR.add(s);
+        if (isTriviallyElimination(x)) {
+            for (String s : teams) {
+                int i = teams.indexOf(s);
+                if (w[x] + r[x] < w[i]) {
+                    subsetR.add(s);
+                }
             }
-        }
-        if (subsetR == null) {
+        } else {
             FlowNetwork flowNetwork = constructFlowNetwork(x);
             FordFulkerson fordFulkerson = new FordFulkerson(flowNetwork, nTeams, nTeams+1);
             for (String s : teams) {
@@ -132,11 +140,10 @@ public class BaseballElimination {
             }
         }
 
-        if (subsetR == null) {
+        if (subsetR.isEmpty()) {
             return null;
-        } else {
-            return subsetR;
         }
+        return subsetR;
     }
 
     public static void main(String[] args) {
@@ -147,7 +154,9 @@ public class BaseballElimination {
         System.out.println(baseballElimination.losses("Toronto"));
         System.out.println(baseballElimination.wins("Baltimore"));
         System.out.println(baseballElimination.remaining("Detroit"));
+        System.out.println(baseballElimination.isEliminated("Toronto"));
         System.out.println(baseballElimination.isEliminated("Detroit"));
-
+        System.out.println(baseballElimination.isEliminated("New_York"));
+        System.out.println(baseballElimination.isEliminated("Boston"));
     }
 }

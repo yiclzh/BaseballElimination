@@ -1,5 +1,13 @@
+import edu.princeton.cs.algs4.FlowEdge;
+import edu.princeton.cs.algs4.FlowNetwork;
+import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.SET;
+
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.Flow;
 
 public class BaseballElimination {
 
@@ -67,23 +75,79 @@ public class BaseballElimination {
         return g[i1][i2];
     }
 
-//    // is the given team eliminated?
-//    public boolean isEliminated(String team) {
-//
-//    }
-//
-//    // subset R of teams that eliminates given team; null if not eliminated
-//    public Iterable<String> certificateOfElimination(String team) {
-//
-//    }
+    // is the given team eliminated?
+    public boolean isEliminated(String team) {
+        if (certificateOfElimination(team) == null) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    public FlowNetwork constructFlowNetwork(int x) {
+        int s = nTeams;
+        int t = s + 1;
+        int gameNode = nTeams + 2;
+        Set<FlowEdge> edges = new HashSet<>();
+        for (int i = 0; i < nTeams; i++) {
+            if ( i != x && w[x] + r[x] >= w[i]) {
+                for (int j = i+1; j < nTeams; j++) {
+                    if (j != x) {
+                        edges.add(new FlowEdge(s, gameNode, g[i][j]));
+                        edges.add(new FlowEdge(gameNode, i, Double.POSITIVE_INFINITY));
+                        edges.add(new FlowEdge(gameNode, j, Double.POSITIVE_INFINITY));
+                        gameNode++;
+                    }
+                }
+                edges.add(new FlowEdge(i, t, w[x] + r[x] - w[i]));
+            }
+        }
+
+        FlowNetwork flowNetwork = new FlowNetwork(gameNode);
+        for (FlowEdge edge : edges) {
+            flowNetwork.addEdge(edge);
+        }
+
+        return flowNetwork;
+    }
+
+    // subset R of teams that eliminates given team; null if not eliminated
+    public Iterable<String> certificateOfElimination(String team) {
+        ArrayList<String> subsetR = new ArrayList<>();
+        int x = this.teams.indexOf(team);
+        for (String s : teams) {
+            int i = teams.indexOf(s);
+            if (w[x] + r[x] < w[i]) {
+                subsetR.add(s);
+            }
+        }
+        if (subsetR == null) {
+            FlowNetwork flowNetwork = constructFlowNetwork(x);
+            FordFulkerson fordFulkerson = new FordFulkerson(flowNetwork, nTeams, nTeams+1);
+            for (String s : teams) {
+                int i = teams.indexOf(s);
+                if (fordFulkerson.inCut(i)) {
+                    subsetR.add(teams.get(i));
+                }
+            }
+        }
+
+        if (subsetR == null) {
+            return null;
+        } else {
+            return subsetR;
+        }
+    }
 
     public static void main(String[] args) {
-        BaseballElimination baseballElimination = new BaseballElimination("//home/yiclzh/Downloads/baseball/teams4.txt");
+        BaseballElimination baseballElimination = new BaseballElimination("//home/yiclzh/Downloads/baseball/teams5.txt");
         System.out.println(baseballElimination.numberOfTeams());
         System.out.println(baseballElimination.teams());
-        System.out.println(baseballElimination.against("Atlanta", "New_York"));
-        System.out.println(baseballElimination.losses("Montreal"));
-        System.out.println(baseballElimination.wins("Philadelphia"));
-        System.out.println(baseballElimination.remaining("New_York"));
+        System.out.println(baseballElimination.against("Boston", "New_York"));
+        System.out.println(baseballElimination.losses("Toronto"));
+        System.out.println(baseballElimination.wins("Baltimore"));
+        System.out.println(baseballElimination.remaining("Detroit"));
+        System.out.println(baseballElimination.isEliminated("Detroit"));
+
     }
 }
